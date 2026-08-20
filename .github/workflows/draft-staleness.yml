@@ -1,0 +1,60 @@
+name: draft-staleness
+
+on:
+  schedule:
+    # Runs weekly on Monday at 09:00 UTC; the monthly DRI issue (1st of month) reads its output.
+    - cron: '0 9 * * 1'
+  workflow_dispatch:
+  workflow_call:
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Find drafts older than 14 days
+        id: scan
+        run: |
+          set -e
+          stale=$(find . -path '*/_drafts/*' -type f -mtime +14 -not -name '.gitkeep' || true)
+          if [ -z "$stale" ]; then
+            echo "result=clean" >> $GITHUB_OUTPUT
+            echo "No stale drafts."
+            exit 0
+          fi
+          echo "result=stale" >> $GITHUB_OUTPUT
+          echo "Stale drafts (>14 days):"
+          echo "$stale"
+          {
+            echo 'list<<EOF'
+            echo "$stale"
+            echo 'EOF'
+          } >> $GITHUB_OUTPUT
+      - name: Post staleness report as an issue
+        if: steps.scan.outputs.result == 'stale'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const list = `${{ steps.scan.outputs.list }}`;
+            const body = [
+              '# Stale drafts report',
+              '',
+              `Drafts in \`_drafts/\` folders older than 14 days. Per v3.1 §14, each draft has three end-states: **merged**, **retired** (moved to \`_archive/\`), or **extended** (Domain Lead approves another 14 days).`,
+              '',
+              '## Drafts',
+              '```',
+              list,
+              '```',
+              '',
+              'Admin: include these in the next monthly DRI close-out and decide per draft.'
+            ].join('\n');
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `Draft staleness — ${new Date().toISOString().slice(0,10)}`,
+              body: body,
+              labels: ['drift', 'harness']
+            });

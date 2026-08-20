@@ -1,0 +1,101 @@
+#!/usr/bin/env bash
+# Pre-commit hook: banned-string check.
+# Installed into .git/hooks/pre-commit by the install-hook step in README.md.
+
+set -e
+
+# Path resolution:
+# - If this hook is running INSIDE the Foundation repo, banned-patterns.yml is at standards/banned-patterns.yml.
+# - If this hook is running in a Domain or Leadership sibling, banned-patterns.yml is at ../organisationos-foundation/standards/banned-patterns.yml.
+patterns_local="standards/banned-patterns.yml"
+patterns_sibling="../organisationos-foundation/standards/banned-patterns.yml"
+
+if [ -f "$patterns_local" ]; then
+  patterns_file="$patterns_local"
+elif [ -f "$patterns_sibling" ]; then
+  patterns_file="$patterns_sibling"
+  # MR-08: warn (do not abort) if the sibling Foundation clone is behind origin/main —
+  # a stale clone means this hook checks against a stale banned-patterns.yml. Best-effort:
+  # a fetch failure (offline, no remote) degrades to a warning, not a block.
+  foundation_dir="../organisationos-foundation"
+  if git -C "$foundation_dir" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    if git -C "$foundation_dir" fetch origin main --quiet 2>/dev/null; then
+      local_rev=$(git -C "$foundation_dir" rev-parse HEAD 2>/dev/null || true)
+      remote_rev=$(git -C "$foundation_dir" rev-parse origin/main 2>/dev/null || true)
+      if [ -n "$local_rev" ] && [ -n "$remote_rev" ] && [ "$local_rev" != "$remote_rev" ]; then
+        echo "WARNING: your Foundation sibling clone ($foundation_dir) is behind origin/main."
+        echo "  banned-patterns.yml may be stale. Run: git -C $foundation_dir pull"
+      fi
+    else
+      echo "WARNING: could not fetch $foundation_dir/origin to check for staleness (offline?)."
+      echo "  Proceeding with the local copy of banned-patterns.yml."
+    fi
+  fi
+else
+  echo "ERROR: banned-patterns.yml not found."
+  echo "  Checked: $patterns_local"
+  echo "  Checked: $patterns_sibling"
+  echo ""
+  echo "If you are working in a Domain or Leadership repo, you must clone Foundation as a sibling:"
+  echo "  cd .. && git clone <adopter-org>/organisationos-foundation"
+  echo ""
+  echo "If Foundation is cloned but at a different relative path, edit this hook to point at it,"
+  echo "or symlink: ln -s /path/to/foundation ../organisationos-foundation"
+  echo ""
+  echo "If you intend to bypass this check (NOT recommended), commit with --no-verify."
+  exit 1
+fi
+
+# Check dependencies. MR-22: a missing tool degrades gracefully — it warns and lets the
+# commit through, rather than hard-failing into a de-facto --no-verify recommendation. The
+# server-side CI check (banned-string-check.yml) is the actual gate and still runs on the PR
+# either way; this hook is a local convenience, not the enforcement point.
+missing_deps=0
+if ! command -v rg >/dev/null 2>&1; then
+  echo "WARNING: ripgrep (rg) is not installed — this hook cannot run the banned-string check locally."
+  echo "  Install: brew install ripgrep (macOS) or apt-get install ripgrep (Linux)."
+  missing_deps=1
+fi
+if ! command -v yq >/dev/null 2>&1; then
+  echo "WARNING: yq is not installed — this hook cannot run the banned-string check locally."
+  echo "  Install: brew install yq (macOS) or https://github.com/mikefarah/yq/releases (Linux)."
+  missing_deps=1
+fi
+if [ "$missing_deps" -eq 1 ]; then
+  echo ""
+  echo "Proceeding WITHOUT a local banned-string check. banned-string-check.yml still runs"
+  echo "server-side on the PR and will catch what this hook missed — install rg + yq so this"
+  echo "hook can catch problems before they reach a PR."
+  exit 0
+fi
+
+# Get staged files
+staged=$(git diff --cached --name-only --diff-filter=AM)
+if [ -z "$staged" ]; then
+  exit 0
+fi
+
+# Patterns and staged paths are newline-separated; iterate without word-splitting
+# so multi-word patterns and filenames containing spaces are handled correctly.
+patterns=$(yq '.[] | .pattern' "$patterns_file" | grep -v '^null$' || true)
+fail=0
+while IFS= read -r p; do
+  [ -z "$p" ] && continue
+  while IFS= read -r f; do
+    [ -z "$f" ] && continue
+    [ -f "$f" ] || continue
+    if rg -qi "\b${p}\b" "$f"; then
+      echo "BLOCKED: $f matches banned pattern '$p'. Remove the identifying detail before committing."
+      fail=1
+    fi
+  done <<< "$staged"
+done <<< "$patterns"
+
+if [ $fail -ne 0 ]; then
+  echo ""
+  echo "Pre-commit aborted. If a banned string slipped through previously, treat the secret as compromised and rotate."
+  echo "If you are unsure, ask the Admin — do not commit with --no-verify."
+  exit 1
+fi
+
+exit 0

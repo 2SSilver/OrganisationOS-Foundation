@@ -1,0 +1,218 @@
+name: self-ci
+
+# Foundation's self-caller (MR-04 fix). Every workflow Foundation ships is a
+# `workflow_call` reusable with no caller of its own — without this file, Foundation
+# PRs run zero CI even though Domain and Leadership run the full suite against
+# Foundation's reusables. This is the delivery mechanism for spec §13.1's promise that
+# "Foundation's own workflows run directly against Foundation PRs."
+#
+# Foundation calls its own reusables by LOCAL path (`./.github/workflows/<name>.yml`),
+# not the cross-repo pinned-tag form (`@v1`, spec §13.1) Domain/Leadership callers use —
+# the reusable lives in this same repo, so there is no cross-repo version to pin.
+#
+# Included — every reusable below exposes only `workflow_call` (no schedule/dispatch
+# trigger of its own), so nothing else runs it against a Foundation PR:
+#   - back-flow-rules  — Pattern A only; internally guarded by the `back-flow` label
+#     check, so it is a no-op on every other PR. Foundation's own CLAUDE.md names
+#     "back-flow review" as one of its two confidentiality-enforcement layers, so this
+#     needs to run here too, not just in Domain.
+#
+# Excluded — promotion-lint is NOT included here even though it otherwise fits the
+# "exposes only workflow_call" inclusion rule: it checks `domain-*/adrs/` for
+# cross-domain ADRs needing promotion, and Foundation has no `domain-*/adrs/` tree.
+# Wiring it in would only add a permanent, always-green no-op check.
+#
+# Excluded — these already run on their own schedule/workflow_dispatch trigger, so
+# adding them here would just duplicate that trigger on every PR:
+#   - draft-staleness.yml (weekly schedule)
+#   - propagation-sla.yml (weekly schedule)
+#
+# Task 4 adds integrity jobs directly in this file (not as standalone reusable workflow
+# files): banned-patterns-validate, codeowners-lint, checklist-complete, agent-mirror-sync.
+# These four are Foundation-only checks (no Domain/Leadership caller ever needs to invoke
+# them), so there is no reason to pay the `workflow_call` reusable-file overhead — they are
+# added as jobs here, consistent with self-ci.yml already being the place Foundation-only
+# integrity logic lives. (Domain's glossary-consistency.yml, added in the same task, is a
+# separate case — it is Domain-only and follows the Category B two-checkout caller shape
+# instead; see that file's header comment.)
+
+on:
+  pull_request:
+    # `labeled`/`unlabeled` are included so the `checklist-complete` job's
+    # label-gated `if:` (below) re-evaluates when a PR gains or loses the
+    # `cross-domain` label after opening, not just at open/sync/reopen —
+    # otherwise a PR labelled post-open with no later push never re-triggers
+    # this workflow and the required check stays stuck "Expected".
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+
+jobs:
+  banned-string:
+    uses: ./.github/workflows/banned-string-check.yml
+    with:
+      foundation-repo: <adopter-org>/organisationos-foundation
+      # Check the PR's own copy of banned-patterns.yml, not main — see Step 3's
+      # exemption in banned-string-check.yml for the companion fix (Fs2-8).
+      foundation-ref: ${{ github.sha }}
+  markdown-lint:
+    uses: ./.github/workflows/markdown-lint.yml
+  format-gate:
+    uses: ./.github/workflows/format-gate.yml
+  structure-check:
+    uses: ./.github/workflows/structure-check.yml
+  pr-preview:
+    uses: ./.github/workflows/pr-preview.yml
+  claude-md-length:
+    uses: ./.github/workflows/claude-md-length.yml
+  link-check:
+    uses: ./.github/workflows/link-check.yml
+  back-flow-rules:
+    uses: ./.github/workflows/back-flow-rules.yml
+
+  # --- Task 4 integrity jobs (below) ---
+
+  banned-patterns-validate:
+    # MR-08: a malformed standards/banned-patterns.yml would silently break the regex loop in
+    # every Domain/Leadership banned-string-check caller and in the pre-commit hook. Runs on
+    # every Foundation PR but only does work when banned-patterns.yml itself changed: parses
+    # the YAML, compiles every regex-flagged pattern, and flags duplicate patterns.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Skip unless banned-patterns.yml changed
+        id: changed
+        run: |
+          set -e
+          if git diff --name-only "origin/${GITHUB_BASE_REF}...HEAD" | grep -qx 'standards/banned-patterns.yml'; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Install yq
+        if: steps.changed.outputs.run == 'true'
+        run: |
+          sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+          sudo chmod +x /usr/local/bin/yq
+      - name: Validate banned-patterns.yml
+        if: steps.changed.outputs.run == 'true'
+        run: |
+          set -e
+          file="standards/banned-patterns.yml"
+          fail=0
+          # yq -e fails non-zero on malformed YAML or a non-sequence top level — this is the
+          # "fail the PR on a malformed list" gate.
+          if ! yq -e 'tag == "!!seq"' "$file" > /dev/null; then
+            echo "::error file=$file::Does not parse as a YAML sequence."
+            exit 1
+          fi
+          # Duplicate patterns.
+          dupes=$(yq '.[] | .pattern' "$file" | grep -v '^null$' | sort | uniq -d || true)
+          if [ -n "$dupes" ]; then
+            echo "::error file=$file::Duplicate pattern(s) found:"
+            echo "$dupes"
+            fail=1
+          fi
+          # Every regex-flagged pattern must actually compile.
+          regex_patterns=$(yq '.[] | select(.match != null and (.match | test("regex"))) | .pattern' "$file" | grep -v '^null$' || true)
+          while IFS= read -r p; do
+            [ -z "$p" ] && continue
+            if ! python3 -c "import re, sys; re.compile(sys.argv[1])" "$p" 2>/tmp/regex-err; then
+              echo "::error file=$file::Pattern '$p' is flagged 'regex' but does not compile: $(cat /tmp/regex-err)"
+              fail=1
+            fi
+          done <<< "$regex_patterns"
+          exit $fail
+
+  codeowners-lint:
+    # MR-06: branch protection (spec §12) only matters if CODEOWNERS actually names >=1 owner
+    # for every substrate path it is meant to gate. This catches the case where protection is
+    # correctly configured but CODEOWNERS itself has a gap. The '*' default fallback does not
+    # count as a dedicated owner for these paths.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify every substrate path has a dedicated owner
+        run: |
+          set -e
+          python3 <<'PY'
+          import sys
+
+          # Substrate paths from spec §3.1 / §12's branch-protection tier table. Update this
+          # list if Foundation's top-level substrate structure changes.
+          SUBSTRATE_PATHS = [
+              "standards", "standards/templates", "interfaces", "cross-domain-decisions",
+              "architectural-decisions", "nfrs", "references", "glossary.md",
+              ".github/workflows", ".github/hooks", ".github/agents",
+              ".github/ISSUE_TEMPLATE", ".claude", "CLAUDE.md", "AGENTS.md",
+              "FORMATS.md", ".mcp.json",
+          ]
+
+          rules = []
+          with open(".github/CODEOWNERS") as f:
+              for line in f:
+                  line = line.strip()
+                  if not line or line.startswith("#"):
+                      continue
+                  parts = line.split()
+                  path = parts[0].strip("/")
+                  handles = parts[1:]
+                  rules.append((path, len(handles) > 0))
+
+          def has_dedicated_owner(target):
+              for path, owned in rules:
+                  if path == "*" or not owned:
+                      continue
+                  if path == target or target.startswith(path + "/") or path.startswith(target + "/"):
+                      return True
+              return False
+
+          fail = False
+          for target in SUBSTRATE_PATHS:
+              if not has_dedicated_owner(target):
+                  print(f"::error file=.github/CODEOWNERS::Substrate path '{target}' has no dedicated CODEOWNERS entry with >=1 owner.")
+                  fail = True
+
+          sys.exit(1 if fail else 0)
+          PY
+
+  checklist-complete:
+    # MR-06: produces the checklist-completeness check the PR templates (Task 1) promise —
+    # "CI verifies this checklist is complete on labelled cross-domain PRs (see Task 4)".
+    # Cross-domain/substrate artefacts (CDRs, interfaces, NFRs, architectural decisions) all
+    # live in Foundation (spec §11.2), so this is the one place the check needs to run.
+    if: contains(github.event.pull_request.labels.*.name, 'cross-domain')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify the PR-template Approval checklist is complete
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          set -e
+          section=$(printf '%s\n' "$PR_BODY" | awk '/^## Approval checklist/{flag=1; next} /^## /{flag=0} flag')
+          if [ -z "$section" ]; then
+            echo "::error::This PR is labelled 'cross-domain' but its body has no '## Approval checklist' section. Use the PR template (see spec §12)."
+            exit 1
+          fi
+          unchecked=$(printf '%s\n' "$section" | grep -c '^- \[ \]' || true)
+          if [ "$unchecked" -gt 0 ]; then
+            echo "::error::This PR is labelled 'cross-domain' but the Approval checklist has $unchecked unticked box(es):"
+            printf '%s\n' "$section" | grep '^- \[ \]'
+            echo "Tick a box only once the named reviewer has actually approved — do not merge on an incomplete checklist."
+            exit 1
+          fi
+          exit 0
+
+  agent-mirror-sync:
+    # MR-12: .github/agents/ is the Copilot-CLI-native location (spec §14); .claude/agents/ is
+    # a thin mirror Claude Code reads until it natively supports .github/agents/. The two must
+    # stay identical or the vendor surfaces silently drift apart.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Diff .claude/agents against .github/agents
+        run: |
+          set -e
+          # .claude/agents/README.md documents the mirror itself and has no .github/agents
+          # counterpart by design — excluded, it is not one of the four mirrored agents.
+          diff -rq --exclude=README.md .claude/agents .github/agents

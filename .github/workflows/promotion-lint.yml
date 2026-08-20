@@ -1,0 +1,78 @@
+name: promotion-lint (reusable)
+
+on:
+  workflow_call:
+    inputs:
+      foundation-repo:
+        type: string
+        required: true
+        description: 'Foundation repo in owner/name format (for glossary domain-name lookup)'
+      foundation-ref:
+        type: string
+        default: main
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout caller repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Checkout Foundation repo
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ inputs.foundation-repo }}
+          ref: ${{ inputs.foundation-ref }}
+          path: _foundation
+      - name: Install yq
+        run: |
+          sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+          sudo chmod +x /usr/local/bin/yq
+      - name: Detect promotion candidates
+        id: detect
+        run: |
+          set -e
+          BASE_REF="${GITHUB_BASE_REF:-main}"
+          changed=$(git diff --name-only --diff-filter=AM "origin/${BASE_REF}...HEAD" \
+                    | grep -E '^domain-[0-9]+/adrs/.*\.md$' || true)
+          if [ -z "$changed" ]; then
+            echo "no_candidates=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # Build the domain-name alternation from Foundation glossary's "## Domains" section.
+          domain_pattern=$(awk '/^## Domains/{flag=1; next} /^## /{flag=0} flag && /^- /{print $2}' \
+                           _foundation/glossary.md | paste -sd'|' -)
+          if [ -z "$domain_pattern" ]; then
+            echo "::error::Foundation glossary.md has no '## Domains' section or no bullet entries."
+            exit 1
+          fi
+          fail=0
+          for f in $changed; do
+            # Slice the YAML frontmatter (between the first and second '---' markers).
+            frontmatter=$(awk 'BEGIN{c=0} /^---$/{c++; if(c==1)next; if(c==2)exit} c==1' "$f")
+            if [ -z "$frontmatter" ]; then
+              echo "::error file=$f::No YAML frontmatter found between '---' markers."
+              fail=1
+              continue
+            fi
+            # Parse with yq; '// default' coerces missing/null to a safe value.
+            if ! shared=$(printf '%s\n' "$frontmatter"          | yq '.shared            // false' - 2>/dev/null) \
+               || ! promoted=$(printf '%s\n' "$frontmatter"     | yq '."promoted-to"     // ""'    - 2>/dev/null) \
+               || ! local_reasoning=$(printf '%s\n' "$frontmatter" | yq '."local-reasoning" // ""'  - 2>/dev/null); then
+              echo "::error file=$f::YAML frontmatter is malformed (yq failed to parse)."
+              fail=1
+              continue
+            fi
+            # Count distinct domain-name mentions in the body (everything after the second '---').
+            body_domains=$(awk 'BEGIN{c=0} /^---$/{c++; next} c>=2' "$f" \
+                           | { grep -oE "$domain_pattern" || true; } \
+                           | sort -u | wc -l | tr -d ' ')
+            if [ "$shared" = "true" ] || [ "$body_domains" -ge 2 ]; then
+              if [ -z "$promoted" ] && [ -z "$local_reasoning" ]; then
+                echo "::error file=$f::Promotion trigger fired but neither 'promoted-to:' nor 'local-reasoning:' is set in frontmatter. Choose one before merging."
+                fail=1
+              fi
+            fi
+          done
+          exit $fail

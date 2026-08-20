@@ -1,0 +1,57 @@
+name: pr-preview
+
+on:
+  workflow_call:
+
+# Permissions for posting comments and deploying previews
+permissions:
+  pull-requests: write
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build-preview:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Render Markdown to HTML
+        # Minimal: convert each changed .md to .html using pandoc.
+        # Adopters may swap for Jekyll/Hugo/MkDocs/Docusaurus.
+        run: |
+          set -e
+          sudo apt-get update && sudo apt-get install -y pandoc
+          mkdir -p _preview
+          changed=$(git diff --name-only --diff-filter=AM "origin/${{ github.base_ref }}...HEAD" | grep '\.md$' || true)
+          if [ -z "$changed" ]; then
+            echo "No changed Markdown files."
+            exit 0
+          fi
+          for f in $changed; do
+            out="_preview/$(echo "$f" | sed 's|/|_|g').html"
+            pandoc "$f" -s --metadata title="$f" -o "$out"
+          done
+      - name: Upload preview artefact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-preview-${{ github.event.number }}
+          path: _preview/
+      - name: Comment preview link
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const url = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const body = [
+              'Rendered preview is built. Click "Artifacts" on the workflow run to download:',
+              url,
+              '',
+              'Reviewers: open the rendered HTML before approving — not the diff. Markdown line-by-line diffs hide rendering changes.',
+              '',
+              '_Adopters may swap this pandoc-based workflow for a GitHub Pages branch-deploy (peaceiris/actions-gh-pages) or Netlify/Cloudflare Pages for inline preview URLs._'
+            ].join('\n');
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });

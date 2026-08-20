@@ -1,0 +1,39 @@
+name: structure-check
+
+on:
+  workflow_call:
+
+jobs:
+  structure:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify mandatory structure
+        run: |
+          set -e
+          fail=0
+          for d in domain-*/; do
+            if [ ! -f "$d/README.md" ]; then
+              echo "::error file=$d::Domain $d is missing mandatory README.md"
+              fail=1
+            fi
+            if [ ! -f "$d/CLAUDE.md" ]; then
+              echo "::error file=$d::Domain $d is missing mandatory CLAUDE.md"
+              fail=1
+            fi
+          done
+          # CDRs must use the template (must contain "## Status" and "## Domains affected")
+          for f in cross-domain-decisions/*.md; do
+            [ -f "$f" ] || continue
+            case "$f" in *README*|*template*) continue ;; esac
+            grep -q "## Status" "$f" || { echo "::error file=$f::CDR missing '## Status' (use cdr-template.md)"; fail=1; }
+            grep -q "## Domains affected" "$f" || { echo "::error file=$f::CDR missing '## Domains affected'"; fail=1; }
+          done
+          # Interfaces must use the template
+          for f in interfaces/*.md; do
+            [ -f "$f" ] || continue
+            case "$f" in *README*|*template*) continue ;; esac
+            grep -q "## Providing domain" "$f" || { echo "::error file=$f::Interface missing '## Providing domain' (use interface-template.md)"; fail=1; }
+            grep -q "## Consuming domain" "$f" || { echo "::error file=$f::Interface missing '## Consuming domain(s)'"; fail=1; }
+          done
+          exit $fail

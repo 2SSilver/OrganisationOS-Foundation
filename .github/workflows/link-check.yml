@@ -1,0 +1,36 @@
+name: link-check
+
+on:
+  workflow_call:
+
+jobs:
+  links:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check links with lychee
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: --no-progress --max-concurrency 4 ./**/*.md
+          fail: true
+      - name: Plain-English failure comment
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = [
+              'link-check found broken links in this PR.',
+              '',
+              'The lychee output above lists each broken URL. To fix:',
+              '- External link 404 → update the URL or remove the reference.',
+              '- Internal link broken → check the path; remember repo-root-relative paths start with `/`.',
+              '- Temporary failure → retry the workflow; if persistent, replace with an alternative source.',
+              '',
+              'If a link points to content tracked in `references.md`, update that file too.'
+            ].join('\n');
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });
