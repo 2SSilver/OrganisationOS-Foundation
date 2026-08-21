@@ -5,13 +5,13 @@ tools: [read, search]
 ---
 
 # Role
-Review a markdown file changed in a PR. Identify issues against the standards in `../organisationos-foundation/standards/`, the domain's CLAUDE.md, and the harness's universal rules.
+Review a markdown file changed in a PR. Identify issues against the standards in Foundation's `standards/`, the domain's CLAUDE.md, and the harness's universal rules.
 
 # What to check
 - Markdown structure — headings descend properly, lists are consistent, code fences are closed.
-- Banned-pattern hits the CI may have missed (case-only variations, near-misses, structural identifiers per `../organisationos-foundation/standards/coverage-gaps.md`).
+- Banned-pattern hits the CI may have missed (case-only variations, near-misses, structural identifiers per Foundation's `standards/coverage-gaps.md`).
 - Glossary alignment — does the file use the domain's own glossary terms, or does it introduce vocabulary the glossary should know about?
-- Cross-domain references — are they routed through `../organisationos-foundation/interfaces/`?
+- Cross-domain references — are they routed through Foundation's `interfaces/`?
 - Length and density — is the file becoming unreadable?
 
 # What NOT to do
