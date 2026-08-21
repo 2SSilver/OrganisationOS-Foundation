@@ -17,7 +17,7 @@ jobs:
         # its failure output stays a plain, static string.
         run: |
           set -e
-          allowed_extensions="md txt csv tsv json yaml yml toml html svg png pdf excalidraw drawio"
+          allowed_extensions="md txt csv tsv json jsonc yaml yml toml html svg png pdf excalidraw drawio"
           formats_extensions=$(sed -n '/## In Git — whitelist/,/Per-PR aggregate cap/p' FORMATS.md \
             | grep -oE '`\.[a-zA-Z]+`' | tr -d '`.' | sort -u | tr '\n' ' ' | sed 's/ *$//')
           normalized_allowed=$(echo "$allowed_extensions" | tr ' ' '\n' | sort -u | tr '\n' ' ' | sed 's/ *$//')
@@ -57,7 +57,7 @@ jobs:
           set -e
           changed=$(git diff --name-only --diff-filter=AM "origin/${GITHUB_BASE_REF}...HEAD")
           if [ -z "$changed" ]; then exit 0; fi
-          allowed_extensions="md txt csv tsv json yaml yml toml html svg png pdf excalidraw drawio"
+          allowed_extensions="md txt csv tsv json jsonc yaml yml toml html svg png pdf excalidraw drawio"
           fail=0
           aggregate_bytes=0
           per_pr_cap_mb=10
