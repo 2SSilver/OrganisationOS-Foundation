@@ -12,7 +12,7 @@ Team Topologies (Skelton & Pais) names four team types — Stream-Aligned, Enabl
 
 ## Canonical source
 
-Matthew Skelton & Manuel Pais, "Team Topologies" — https://teamtopologies.com/
+Matthew Skelton & Manuel Pais, "Team Topologies" — <https://teamtopologies.com/>
 
 ## Note on use in OrganisationOS
 

@@ -23,7 +23,7 @@ Find practices in one domain that recur across others. Candidates for promotion 
 
 A markdown report:
 
-```
+```markdown
 # Promotion candidates — YYYY-MM-DD
 
 ## Strong candidates (recurring in ≥3 domains)

@@ -3,7 +3,7 @@
 The `banned-patterns.yml` substring/regex check catches the careless human; it does not catch structural identifiers. Six categories of leak that CI cannot detect, and the harness defence for each:
 
 | Gap | Example | Defence |
-|---|---|---|
+| --- | --- | --- |
 | **Paraphrased identifiers** | A client called "Nordic Bank" written elsewhere as "the Scandinavian retail-banking group" | Back-flow review (Domain Lead + Admin), `glossary-check` agent |
 | **Structural identifiers** | An industry × region × company-size triple unique to one client | Back-flow review; `context-near` patterns in `banned-patterns.yml` |
 | **Numerical identifiers** | An unusual contract value, headcount, KPI baseline | Back-flow review with explicit numerical-anomaly check |

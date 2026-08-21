@@ -9,15 +9,18 @@ Required reviewer for: everything in this domain
 Read for context: all of `./`, `../../organisationos-foundation/`
 
 ## My preferences
+
 - Quality reviews focus on the artefact, not the agent's review report
 - Use rendered preview before approving any PR
 - Flag CLAUDE.md length approaching 300 lines — split before adding more
 
 ## Active focus
+
 - <Current piece of work 1>
 - <Current cross-domain coupling under discussion>
 
 ## My peer references
+
 - PO for this domain: @<handle>
 - Team Members: @<handles>
 - Other Domain Leads: @<handles> — frequent cross-domain coordination
@@ -25,6 +28,7 @@ Read for context: all of `./`, `../../organisationos-foundation/`
 - Leader: @<handle> — CDR escalations
 
 ## My agent preferences
+
 - The `reviewer.md` agent (`.github/agents/`) is good for first-pass review; I read the artefact second
 - The `glossary-check.md` agent is good for catching vocabulary drift
 - Run `drift-check` monthly on my own domain before the DRI sweep
@@ -35,7 +39,7 @@ You work primarily in the **Domain repo**, reviewing every PR in your domain fol
 
 Clone layout (siblings under one parent folder):
 
-```
+```text
 ~/projects/<adopter-org>/
 ├── organisationos-foundation/   # required (loaded via additionalDirectories)
 └── organisationos-domain/       # your primary working repo

@@ -13,7 +13,7 @@ The other two repos — Leadership and Domain — reference this repo. Changes h
 What lives in Foundation:
 
 | Path | Contents |
-|---|---|
+| --- | --- |
 | `standards/` | Templates (ADR, CDR, NFR, interface), banned-pattern list, coverage gaps |
 | `glossary.md` | Terms used across ≥2 domains |
 | `interfaces/` | Cross-domain interface contracts |
@@ -35,7 +35,7 @@ What does NOT live here: per-domain working content, Leadership strategy/cadence
 
 Recommended layout — all three repos as siblings under one parent folder:
 
-```
+```text
 ~/projects/<adopter-org>/
   organisationos-foundation/     ← this repo
   organisationos-leadership/     ← Leadership repo
@@ -49,7 +49,7 @@ Recommended layout — all three repos as siblings under one parent folder:
 ## 4. Role-to-clone-set matrix
 
 | Role | Required clones | `additionalDirectories` pattern |
-|---|---|---|
+| --- | --- | --- |
 | Team Member / Product Owner / Domain Lead | Domain + Foundation | `["../organisationos-foundation"]` in Domain's `settings.local.json` |
 | Leader | All three | `["../organisationos-foundation", "../organisationos-domain"]` from Leadership; or `["../organisationos-foundation", "../organisationos-leadership"]` from Domain |
 | Admin | All three (+ per-domain if split-per-domain) | Full set in every clone's `settings.local.json` |
@@ -73,7 +73,7 @@ Foundation itself does not need `additionalDirectories` — it is the source, no
 
 ## 6. Repository structure
 
-```
+```text
 organisationos-foundation/
   CLAUDE.md                        ← canonical substrate rules (loaded by all three repos)
   AGENTS.md                        ← cross-vendor agent baseline

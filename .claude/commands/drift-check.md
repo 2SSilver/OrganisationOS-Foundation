@@ -63,7 +63,7 @@ exists to be trusted at the monthly DRI close-out.
 
 A markdown report:
 
-```
+```markdown
 # Drift report — YYYY-MM-DD
 
 ## Domain-level findings

@@ -5,6 +5,7 @@ description: Produce a personalised 30-day onboarding plan for a new joiner base
 # onboard
 
 Personalise this onboarding plan for the joiner. Ask:
+
 1. Which role? (Product Owner / Team Member / Domain Lead / Leader / Admin)
 2. Which domain? (or "leadership-tier" for Leader/Admin)
 3. Start date (defaults to today)?
@@ -24,10 +25,12 @@ Then output a dated 30-day plan with these milestones. Save the output to `<doma
   Install the workflow plugin per the org's `.claude/settings.json`
   pin (see §15).
 - **Day 3:** Install the pre-commit banned-string hook:
+
   ```bash
   ln -sf ../../.github/hooks/banned-string-pre-commit .git/hooks/pre-commit
   chmod +x .git/hooks/pre-commit
   ```
+
 - **Day 4:** Run a smoke-test session in the joiner's working directory. Verify the Precedence block addresses the joiner as named (not "your human partner").
 - **Day 5:** Read the domain's `references.md` and the relevant templates in Foundation's `standards/templates/`.
 

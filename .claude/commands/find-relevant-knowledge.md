@@ -26,7 +26,7 @@ On session start for any non-trivial task, run this command against the folders 
 
 A markdown report with:
 
-```
+```markdown
 ## Relevant existing knowledge for: <task description>
 
 ### Active matches (top 10)

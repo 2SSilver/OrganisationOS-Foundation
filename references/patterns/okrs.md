@@ -13,8 +13,8 @@ OKRs (Objectives and Key Results) are outcome-oriented planning artefacts. An ob
 ## Canonical sources
 
 - John Doerr, "Measure What Matters"
-- Christina Wodtke, "Radical Focus" — https://eleganthack.com/
-- Tim Herbig, "Outcome OKRs" — https://herbig.co/
+- Christina Wodtke, "Radical Focus" — <https://eleganthack.com/>
+- Tim Herbig, "Outcome OKRs" — <https://herbig.co/>
 
 ## Note on use in OrganisationOS
 

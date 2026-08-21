@@ -5,14 +5,15 @@ External documents, dashboards, decks, and live systems this domain depends on b
 The Admin verifies the `Last verified` column at the monthly DRI review (see `.github/ISSUE_TEMPLATE/monthly-dri.md`).
 
 | Title | URL | Owner | Retention | Last verified |
-|---|---|---|---|---|
-| Q1 board deck | https://… | @<lead> | 12 months | YYYY-MM-DD |
-| Customer-health dashboard | https://… (Looker) | @<analyst> | indefinite | YYYY-MM-DD |
-| Vendor contract (PDF stored in Drive) | https://… | @<admin> | 7 years | YYYY-MM-DD |
+| --- | --- | --- | --- | --- |
+| Q1 board deck | <url> | @<lead> | 12 months | YYYY-MM-DD |
+| Customer-health dashboard | <url> (Looker) | @<analyst> | indefinite | YYYY-MM-DD |
+| Vendor contract (PDF stored in Drive) | <url> | @<admin> | 7 years | YYYY-MM-DD |
 
 ## Retention policy (adopter-defined)
 
 Set defaults per domain. Examples:
+
 - **Consulting work:** per-engagement (cleared when the engagement closes)
 - **Research lab:** until grant audit + 7 years
 - **Product team:** 12 months for analytics dashboards, indefinite for active product docs
@@ -28,4 +29,3 @@ When `Retention` expires, the row is moved to `_archive/references-archived.md` 
 - One file per reference under `references/`, named for the artefact
 
 This is an option for domains with heavy external-artefact traffic, not a default — small domains keep the single-file form above. See v3.1 §16.
-

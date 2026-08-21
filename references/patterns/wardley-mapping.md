@@ -13,7 +13,7 @@ Wardley Mapping is a strategic-planning technique that places a value chain on t
 
 ## Canonical source
 
-Simon Wardley, "Wardley Maps" — https://learnwardleymapping.com/ and the book serialised on Medium.
+Simon Wardley, "Wardley Maps" — <https://learnwardleymapping.com/> and the book serialised on Medium.
 
 ## Note on use in OrganisationOS
 

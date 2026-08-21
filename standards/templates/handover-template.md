@@ -7,11 +7,13 @@ Handover Forum: <date of the Leadership Forum the incoming Admin will attend bef
 ## 1. Open items at handover
 
 Open propagation actions — snapshot of `leadership/cadence/propagation-log.md`:
+
 - Open propagation actions: <count>
 - Items >30 days past deadline: <count>
 - Items requiring escalation: <list with CDR refs>
 
 Open harness-drift / improvement items — snapshot of `leadership/steward/drift-log.md`:
+
 - Open drift / improvement items: <count>
 
 ## 2. Last 3 monthly DRI summaries
@@ -23,6 +25,7 @@ Open harness-drift / improvement items — snapshot of `leadership/steward/drift
 ## 3. Pending improvement-loop proposals
 
 PRs the outgoing Admin drafted but did not merge:
+
 - [ ] PR #<n>: <title> — status, recommended next step
 - [ ] PR #<n>: …
 
@@ -39,6 +42,7 @@ Patterns added in the last 90 days; rationale per pattern. Incoming Admin review
 ## 6. Cross-domain stewardship state (at scale)
 
 If per-domain stewards are in place (org >50 people), list them and any open coordination items:
+
 - Domain 1 steward: @<handle>; open items: …
 - Domain 2 steward: @<handle>; open items: …
 
@@ -53,6 +57,7 @@ The incoming Admin pairs on one Leadership Forum before going solo. The outgoing
 - [ ] Outgoing Admin's contact retained for two follow-up cycles
 
 ## Signed
+
 - Outgoing Admin: @<outgoing-handle> on YYYY-MM-DD
 - Incoming Admin: @<incoming-handle> on YYYY-MM-DD
 - Leader (acknowledged): @<leader-handle> on YYYY-MM-DD

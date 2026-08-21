@@ -22,6 +22,7 @@ Terms used across two or more domains in this organisation. Domain-specific term
 ## Adopter additions
 
 Adopters add terms here that span multiple domains in their organisation. Examples:
+
 - A shared methodology name used by multiple domains.
 - A reporting cadence or artefact consumed by multiple domains.
 - A regulatory or compliance term that crosses domains.

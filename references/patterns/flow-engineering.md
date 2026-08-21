@@ -12,7 +12,7 @@ Flow Engineering (Steve Pereira) is a five-map sequence for value-stream alignme
 
 ## Canonical source
 
-Steve Pereira & Andrew Davis, "Flow Engineering" — https://flowengineering.com/
+Steve Pereira & Andrew Davis, "Flow Engineering" — <https://flowengineering.com/>
 
 ## Note on use in OrganisationOS
 

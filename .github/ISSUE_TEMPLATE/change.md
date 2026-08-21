@@ -5,9 +5,11 @@ labels: change
 ---
 
 ## Proposing
+
 @<your-handle>
 
 ## Domain
+
 - [ ] Domain 1
 - [ ] Domain 2
 - [ ] Domain 3
@@ -16,13 +18,17 @@ labels: change
 - [ ] leadership/
 
 ## What
+
 One sentence.
 
 ## Why
+
 One sentence.
 
 ## Effort
+
 trivial | small | medium
 
 ## Anyone needs to know?
+
 @<handles or "no">

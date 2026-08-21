@@ -45,6 +45,7 @@ Anything not named above — Foundation's `standards/banned-patterns.yml`, the L
 ## Back-flow PRs
 
 When something generalises from this engagement to the harness:
+
 1. Strip identifying detail locally — run the harness's `anonymisation-check` skill.
 2. Open a PR in the harness with the `back-flow` label.
 3. Two-reviewer rule applies — Domain Lead + Admin (or peer Domain Lead).
@@ -55,7 +56,8 @@ When something generalises from this engagement to the harness:
 - No auto-sync from this repo into the harness.
 - No two-way sync of any kind.
 - No agent-initiated back-flow within a session that has read external-work files.
-```
+
+```markdown
 
 ## Adopter customisation
 

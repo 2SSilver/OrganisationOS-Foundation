@@ -3,6 +3,7 @@
 This folder holds organisation-wide non-functional requirements that all domains must adhere to.
 
 NFRs originate either:
+
 - Directly authored at Foundation (e.g. a Chief Product Owner declares a standard)
 - Promoted from a domain context where the contributor recognised the cross-domain applicability
 

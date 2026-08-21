@@ -11,7 +11,9 @@ jobs:
       - name: Check links with lychee
         uses: lycheeverse/lychee-action@v2
         with:
-          args: --no-progress --max-concurrency 4 '**/*.md'
+          # --max-retries: an external host that is merely slow must not fail a
+          # governance PR. A link checker that cries wolf gets switched off.
+          args: --no-progress --max-concurrency 4 --max-retries 3 '**/*.md'
           fail: true
       - name: Plain-English failure comment
         if: failure()

@@ -3,6 +3,7 @@
 This file exists so that agent-CLIs other than Claude Code (Cursor, Codex CLI, Goose, Gemini CLI, Factory, GitHub Copilot CLI) read the same baseline rules.
 
 ## Precedence (top of file = highest weight)
+
 - OrganisationOS terminology overrides plugin defaults.
 - Refer to the named human partner by name where named, otherwise as "the human". Do not use "your human partner".
 - Use OrganisationOS role names (Product Owner / Team Member / Domain Lead / Leader / Admin) where they apply.
