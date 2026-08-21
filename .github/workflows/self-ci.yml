@@ -183,22 +183,50 @@ jobs:
     # "CI verifies this checklist is complete on labelled cross-domain PRs (see Task 4)".
     # Cross-domain/substrate artefacts (CDRs, interfaces, NFRs, architectural decisions) all
     # live in Foundation (spec §11.2), so this is the one place the check needs to run.
-    if: contains(github.event.pull_request.labels.*.name, 'cross-domain')
+    # AR-09: NO job-level `if:`. GitHub counts a skipped required check as
+    # passing, so a label-gated job silently reported green on every
+    # unlabelled cross-domain PR. Applicability is now computed from the
+    # changed files inside the job, so the check always runs and always
+    # reports. Labels are triage only and no longer gate anything.
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Determine whether this PR is cross-domain
+        id: scope
+        run: |
+          set -e
+          files=$(git diff --name-only "origin/${{ github.base_ref }}...HEAD")
+          printf 'changed files:\n%s\n' "$files"
+          cross=no
+          # Substrate artefacts that are cross-domain by definition (spec 11.2).
+          if printf '%s\n' "$files" | grep -qE '^(cross-domain-decisions|interfaces|nfrs)/'; then
+            cross=yes
+          fi
+          # Or a diff spanning two or more domain folders.
+          domains=$(printf '%s\n' "$files" | grep -oE '^domain-[0-9]+/' | sort -u | wc -l | tr -d ' ')
+          if [ "$domains" -ge 2 ]; then cross=yes; fi
+          echo "cross_domain=$cross" >> "$GITHUB_OUTPUT"
+          echo "cross_domain=$cross (domain folders touched: $domains)"
       - name: Verify the PR-template Approval checklist is complete
         env:
           PR_BODY: ${{ github.event.pull_request.body }}
+          CROSS_DOMAIN: ${{ steps.scope.outputs.cross_domain }}
         run: |
           set -e
+          if [ "$CROSS_DOMAIN" != "yes" ]; then
+            echo "Not a cross-domain PR — Approval checklist not required. Check passes."
+            exit 0
+          fi
           section=$(printf '%s\n' "$PR_BODY" | awk '/^## Approval checklist/{flag=1; next} /^## /{flag=0} flag')
           if [ -z "$section" ]; then
-            echo "::error::This PR is labelled 'cross-domain' but its body has no '## Approval checklist' section. Use the PR template (see spec §12)."
+            echo "::error::This PR changes cross-domain substrate but its body has no '## Approval checklist' section. Use the PR template (see spec §12)."
             exit 1
           fi
           unchecked=$(printf '%s\n' "$section" | grep -c '^- \[ \]' || true)
           if [ "$unchecked" -gt 0 ]; then
-            echo "::error::This PR is labelled 'cross-domain' but the Approval checklist has $unchecked unticked box(es):"
+            echo "::error::This PR changes cross-domain substrate but the Approval checklist has $unchecked unticked box(es):"
             printf '%s\n' "$section" | grep '^- \[ \]'
             echo "Tick a box only once the named reviewer has actually approved — do not merge on an incomplete checklist."
             exit 1
