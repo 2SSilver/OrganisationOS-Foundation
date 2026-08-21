@@ -13,6 +13,10 @@ jobs:
           set -e
           fail=0
           for d in domain-*/; do
+            # A repo with no domain-* directories (Foundation) leaves the glob
+            # literal; skipping non-directories makes this a no-op there while
+            # keeping every assertion for Domain callers. AR-02.
+            [ -d "$d" ] || continue
             if [ ! -f "$d/README.md" ]; then
               echo "::error file=$d::Domain $d is missing mandatory README.md"
               fail=1
