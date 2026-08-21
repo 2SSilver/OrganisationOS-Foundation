@@ -65,6 +65,14 @@ jobs:
   stale-path-check:
     uses: ./.github/workflows/stale-path-check.yml
   pr-preview:
+    # Job-scoped, not workflow-scoped: a caller must be able to grant whatever
+    # its callee requests, and pr-preview posts a PR comment. Keeping the grant
+    # on this one job leaves every other job in this file on the repo's
+    # read-only default. A workflow-level block would hand write access to all
+    # twelve.
+    permissions:
+      pull-requests: write
+      contents: read
     uses: ./.github/workflows/pr-preview.yml
   claude-md-length:
     uses: ./.github/workflows/claude-md-length.yml
