@@ -6,7 +6,7 @@
 
 Commit area: `./CLAUDE.md`, `./glossary.md`, `./README.md`, `./quality-standards/` (anything that defines the domain's quality bar)
 Required reviewer for: everything in this domain
-Read for context: all of `./`, `../foundation/`, `../leadership/`
+Read for context: all of `./`, `../../organisationos-foundation/`, `../../organisationos-leadership/`
 
 ## My preferences
 - Quality reviews focus on the artefact, not the agent's review report

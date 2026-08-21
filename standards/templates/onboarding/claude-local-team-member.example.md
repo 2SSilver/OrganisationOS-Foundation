@@ -5,8 +5,8 @@
 ## I am a Team Member in Domain <N>
 
 Daily work: `./<execution-area>/methods/`, `./<execution-area>/notes/`, `./analysis/` (or equivalent)
-Read for context: `../foundation/`, `../leadership/strategy/`, `./README.md`
-Never commit to: `./outputs/`, `../foundation/standards/`, `../.github/`
+Read for context: `../../organisationos-foundation/`, `./README.md`
+Never commit to: `./outputs/`, `../../organisationos-foundation/standards/`, `../.github/`
 
 ## My preferences
 - Concise output — ask for detail when needed

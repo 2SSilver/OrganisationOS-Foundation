@@ -5,8 +5,8 @@
 ## I am the Product Owner for Domain <N>
 
 Commit area: `./outputs/`, `./<offerings-or-equivalent>/` — what this domain offers
-Read for context: `./`, `../foundation/`, `../leadership/strategy/`
-Never commit to: `./<execution-area>/`, `../foundation/standards/`, `../.github/`
+Read for context: `./`, `../../organisationos-foundation/`, `../../organisationos-leadership/strategy/`
+Never commit to: `./<execution-area>/`, `../../organisationos-foundation/standards/`, `../.github/`
 
 ## My preferences
 - Outputs should lead with the audience perspective, not the producer perspective
