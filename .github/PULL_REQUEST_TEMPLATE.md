@@ -28,7 +28,7 @@ actual affected set.
 - [ ] Product Owner approved (where the CDR template lists PO for this artefact type)
 - [ ] Admin approved (where the CDR template lists Admin for this artefact type)
 
-CI verifies this checklist is complete on labelled cross-domain PRs (see Task 4).
+CI verifies this checklist is complete on any PR that changes cross-domain substrate — `interfaces/`, `cross-domain-decisions/`, `architectural-decisions/`, `nfrs/` — or spans two or more domains. It is detected from the changed files, not from a label, so there is no label to forget.
 
 ## Reviewer affordances
 - [ ] Rendered preview opened: <link auto-posted by CI>

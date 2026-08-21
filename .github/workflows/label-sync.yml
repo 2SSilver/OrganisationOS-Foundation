@@ -45,11 +45,15 @@ jobs:
               echo "updated: $name"
             fi
           }
-          while IFS= read -r line; do
+          # `|| [ -n "$line" ]` also processes a final line with no trailing
+          # newline — without it, `read` fails on EOF and drops that line, so a
+          # labels.yml missing a trailing newline would silently give the last
+          # label the previous one's description via the stale $desc.
+          while IFS= read -r line || [ -n "$line" ]; do
             case "$line" in
-              '- name: '*) apply; name=$(printf '%s' "$line" | sed 's/^- name: *//; s/^"//; s/"$//') ;;
-              '  color: '*) color=$(printf '%s' "$line" | sed 's/^  color: *//; s/^"//; s/"$//') ;;
-              '  description: '*) desc=$(printf '%s' "$line" | sed 's/^  description: *//; s/^"//; s/"$//') ;;
+              '- name: '*) apply; name=$(printf '%s' "$line" | sed 's/^- name: *//; s/[[:space:]]*$//; s/^"//; s/"$//') ;;
+              '  color: '*) color=$(printf '%s' "$line" | sed 's/^  color: *//; s/[[:space:]]*$//; s/^"//; s/"$//') ;;
+              '  description: '*) desc=$(printf '%s' "$line" | sed 's/^  description: *//; s/[[:space:]]*$//; s/^"//; s/"$//') ;;
             esac
           done < .github/labels.yml
           apply
