@@ -1,4 +1,4 @@
-# foundation/.claude/skills/
+# .claude/skills/
 
 Org-wide skills authored by the adopter. Skills here apply across all domains.
 

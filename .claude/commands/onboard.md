@@ -26,7 +26,7 @@ Then output a dated 30-day plan with these milestones. Save the output to `<doma
   chmod +x .git/hooks/pre-commit
   ```
 - **Day 4:** Run a smoke-test session in the joiner's working directory. Verify the Precedence block addresses the joiner as named (not "your human partner").
-- **Day 5:** Read the domain's `references.md` and the relevant `foundation/standards/templates/`.
+- **Day 5:** Read the domain's `references.md` and the relevant `../organisationos-foundation/standards/templates/`.
 
 ## Week 2 — pair on one PR
 

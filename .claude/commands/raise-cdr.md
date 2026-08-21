@@ -10,7 +10,7 @@ Draft a CDR from the current session's cross-domain implications.
 
 1. Identify the cross-domain implication. Ask the operator if not obvious.
 2. List the domains affected and the impact level for each (high / medium / low).
-3. Open `foundation/standards/templates/cdr-template.md` as the starting shape.
+3. Open `../organisationos-foundation/standards/templates/cdr-template.md` as the starting shape.
 4. Fill in:
    - Title (one line)
    - Status: Proposed
@@ -18,7 +18,7 @@ Draft a CDR from the current session's cross-domain implications.
    - Context (one paragraph)
    - Decision (one paragraph — proposed)
    - Consequences per domain (action + owner placeholder + deadline placeholder)
-5. Save as `foundation/cross-domain-decisions/_drafts/cdr-{timestamp}-{slug}.md` (or `_drafts/` inside the foundation folder if the directory exists).
+5. Save as `../organisationos-foundation/cross-domain-decisions/_drafts/cdr-{timestamp}-{slug}.md` (or `_drafts/` inside the foundation folder if the directory exists).
 6. Surface the path for the operator to review.
 
 ## What this command does NOT do

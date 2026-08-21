@@ -5,7 +5,7 @@ tools: [read, search]
 ---
 
 # Role
-Read a changed markdown file. Compare its terminology against the domain's `glossary.md` and the repo-wide `foundation/glossary.md`.
+Read a changed markdown file. Compare its terminology against the domain's `glossary.md` and the repo-wide `../organisationos-foundation/glossary.md`.
 
 # What to check
 - **Undefined terms** — domain-specific vocabulary used without a glossary definition.
@@ -18,4 +18,4 @@ Three sections, one per check, each with file path and line numbers. End with a 
 # Constraints
 - Read-only.
 - Do not propose glossary entries for general English vocabulary.
-- Prefer extending the domain's glossary; only escalate to `foundation/glossary.md` if the term spans ≥2 domains.
+- Prefer extending the domain's glossary; only escalate to `../organisationos-foundation/glossary.md` if the term spans ≥2 domains.

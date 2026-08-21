@@ -29,4 +29,4 @@ One paragraph.
 - Deadline: ...
 
 ## Next step
-This issue is a stub. The full CDR draft uses `foundation/standards/templates/cdr-template.md` and lives at `foundation/cross-domain-decisions/`. Open a draft PR with the CDR file once this issue is acknowledged.
+This issue is a stub. The full CDR draft uses Foundation's `standards/templates/cdr-template.md` and lives at Foundation's `cross-domain-decisions/`. Open a draft PR with the CDR file once this issue is acknowledged.

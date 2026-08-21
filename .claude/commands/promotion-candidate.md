@@ -1,10 +1,10 @@
 ---
-description: Surface practices in one domain that recur across others. Candidates for promotion into `foundation/`. Admin tool.
+description: Surface practices in one domain that recur across others. Candidates for promotion into Foundation. Admin tool.
 ---
 
 # promotion-candidate
 
-Find practices in one domain that recur across others. Candidates for promotion into `foundation/` (cross-domain shared content).
+Find practices in one domain that recur across others. Candidates for promotion into Foundation (cross-domain shared content).
 
 ## Definitions
 
@@ -32,7 +32,7 @@ A markdown report:
 - Original: domain-1/methods/<file>.md
 - Also in: domain-2/methods/<file2>.md, domain-3/methods/<file3>.md
 - Variance: <one sentence on how the files differ>
-- Recommended action: promote a shared version to foundation/standards/, retire the domain copies.
+- Recommended action: promote a shared version to Foundation's standards/, retire the domain copies.
 
 ## Weak candidates (recurring in 2 domains)
 
@@ -44,4 +44,4 @@ A markdown report:
 ## What this command is NOT
 
 - Not a promotion executor. The Admin reads the report and decides whether to PR a promotion.
-- Promotions are two-approver PRs touching `foundation/` (Admin + Leader per CODEOWNERS).
+- Promotions are two-approver PRs touching Foundation (Admin + Leader per CODEOWNERS).

@@ -12,7 +12,7 @@ I commit unilaterally only to `leadership/steward/`. Everywhere else I open a PR
 
 ## Decision rights
 - I decide: drift-log triage, propagation-action urgency, monthly DRI close-out
-- I do NOT decide alone: harness changes to `foundation/standards/` (Leader co-signs); plugin pin bumps (Leader co-signs); structural CI rule changes (Leader co-signs)
+- I do NOT decide alone: harness changes to Foundation's `standards/` (Leader co-signs); plugin pin bumps (Leader co-signs); structural CI rule changes (Leader co-signs)
 - My publish gate has a 5-working-day SLA. After that, the Leader can co-approve in my absence.
 
 ## My preferences

@@ -5,7 +5,7 @@
 ## I am the Leader
 
 Commit area: `leadership/strategy/`, `leadership/cadence/` (forum minutes, agendas)
-Required reviewer for: cross-domain decisions (CDRs), changes to `leadership/`, two-approver on `foundation/standards/` and `.github/workflows/`
+Required reviewer for: cross-domain decisions (CDRs), changes to `leadership/`, two-approver on Foundation's `standards/` and `.github/workflows/`
 Does not commit inside any single domain.
 
 ## My preferences

@@ -14,7 +14,7 @@
 
 ### Confidentiality — direction of flow
 - This repo is the source of truth for situation-specific, confidential, time-bounded work.
-- The harness mounted at `<absolute-path-to-harness>` is the source of truth for shared, anonymised, reusable knowledge.
+- The Foundation clone mounted at `<absolute-path-to-foundation-clone>` is the source of truth for shared, anonymised, reusable knowledge.
 - **Knowledge flows one direction — inward to the harness, never outward from this repo into the harness without anonymisation.**
 
 ### Agent-overreach defence (read carefully)
@@ -31,16 +31,16 @@
 # Name only safe subfolders — never the harness repo root. Repeat --add-dir
 # per subfolder; nothing outside this list is visible to the session.
 claude \
-  --add-dir <absolute-path-to-harness>/foundation/interfaces \
-  --add-dir <absolute-path-to-harness>/foundation/standards/templates \
-  --add-dir <absolute-path-to-harness>/foundation/syntheses \
-  --add-dir <absolute-path-to-harness>/foundation/glossary.md
+  --add-dir <absolute-path-to-foundation-clone>/interfaces \
+  --add-dir <absolute-path-to-foundation-clone>/standards/templates \
+  --add-dir <absolute-path-to-foundation-clone>/syntheses \
+  --add-dir <absolute-path-to-foundation-clone>/glossary.md
 
 # Alternative: environment variable (same named allow-list, path-list per CLI docs)
-export CLAUDE_CODE_ADDITIONAL_DIRECTORIES_CLAUDE_MD=<absolute-path-to-harness>/foundation/interfaces:<absolute-path-to-harness>/foundation/standards/templates:<absolute-path-to-harness>/foundation/syntheses:<absolute-path-to-harness>/foundation/glossary.md
+export CLAUDE_CODE_ADDITIONAL_DIRECTORIES_CLAUDE_MD=<absolute-path-to-foundation-clone>/interfaces:<absolute-path-to-foundation-clone>/standards/templates:<absolute-path-to-foundation-clone>/syntheses:<absolute-path-to-foundation-clone>/glossary.md
 ```
 
-Anything not named above — `foundation/standards/banned-patterns.yml`, the Leadership drift log, the propagation log, and any file added to the harness after this list was written — stays hidden by default. The allow-list is fail-closed: the operator names what is safe to mount, not what is sensitive to exclude, so a new sensitive file created after adoption is invisible without anyone updating an exclusion list.
+Anything not named above — Foundation's `standards/banned-patterns.yml`, the Leadership drift log, the propagation log, and any file added to the harness after this list was written — stays hidden by default. The allow-list is fail-closed: the operator names what is safe to mount, not what is sensitive to exclude, so a new sensitive file created after adoption is invisible without anyone updating an exclusion list.
 
 ## Back-flow PRs
 
@@ -59,4 +59,4 @@ When something generalises from this engagement to the harness:
 
 ## Adopter customisation
 
-Replace `<absolute-path-to-harness>` with the real path. Add project-specific rules below the absolute rules section. Add the project's stakeholders, working hours, communication channels — anything an agent should know to operate inside *this* engagement.
+Replace `<absolute-path-to-foundation-clone>` with the real path to your Foundation clone. Add project-specific rules below the absolute rules section. Add the project's stakeholders, working hours, communication channels — anything an agent should know to operate inside *this* engagement.

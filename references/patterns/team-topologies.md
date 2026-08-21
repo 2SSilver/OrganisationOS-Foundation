@@ -16,4 +16,4 @@ Matthew Skelton & Manuel Pais, "Team Topologies" — https://teamtopologies.com/
 
 ## Note on use in OrganisationOS
 
-The harness's "interface" pattern (`foundation/interfaces/`) loosely maps to the X-as-a-Service interaction mode. Adopters using Team Topologies seriously may name each interface with the interaction mode it represents.
+The harness's "interface" pattern (Foundation's `interfaces/`) loosely maps to the X-as-a-Service interaction mode. Adopters using Team Topologies seriously may name each interface with the interaction mode it represents.

@@ -12,7 +12,7 @@ labels: proposal
 - [ ] Domain 2
 - [ ] Domain 3
 - [ ] Domain 4
-- [ ] foundation/
+- [ ] Foundation (substrate)
 
 ## What is being proposed
 One paragraph.
