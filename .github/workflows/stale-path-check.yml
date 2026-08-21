@@ -24,6 +24,12 @@ name: stale-path-check
 #     this check fail on every PR in every repo that runs it. grep --exclude
 #     matches on basename, so the one flag covers this reusable and each
 #     repo's caller of the same name.
+#   - The allow-list is applied by SCRUBBING those substrings from a lowercased
+#     copy of each line and testing what remains — not by discarding matching
+#     lines. Discarding would hide a genuine violation that happens to share a
+#     line with a legitimate reference, e.g. "was `foundation/x`, now
+#     `../organisationos-foundation/x`". Matching is case-insensitive because
+#     "Foundation" is a capitalised proper noun throughout this harness's prose.
 
 on:
   workflow_call:
@@ -37,15 +43,14 @@ jobs:
         run: |
           set -e
           fail=0
-          hits=$(grep -rn 'foundation/' . --exclude-dir=.git --exclude=stale-path-check.yml \
-                  | grep -v 'organisationos-foundation' \
-                  | grep -v '_foundation' || true)
+          hits=$(grep -rniE 'foundation/' . --exclude-dir=.git --exclude=stale-path-check.yml \
+                  | awk '{ t=tolower($0); gsub(/organisationos-foundation/,"",t); gsub(/_foundation/,"",t); if (t ~ /foundation\//) print }' || true)
           if [ -n "$hits" ]; then
             echo "::error::monorepo-era 'foundation/<path>' prefix found. Foundation content is at the repo root; use a bare path inside Foundation, or ../organisationos-foundation/<path> from a sibling repo."
             printf '%s\n' "$hits"
             fail=1
           fi
-          bare=$(grep -rnE '\.\./(foundation|leadership|domain)[/ ]' . --exclude-dir=.git --exclude=stale-path-check.yml || true)
+          bare=$(grep -rniE '\.\./(foundation|leadership|domain)[/ ]' . --exclude-dir=.git --exclude=stale-path-check.yml || true)
           if [ -n "$bare" ]; then
             echo "::error::bare sibling path found. Use ../organisationos-<repo>/ (and ../../ from one level in)."
             printf '%s\n' "$bare"
