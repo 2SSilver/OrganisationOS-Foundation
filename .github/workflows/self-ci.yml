@@ -59,6 +59,8 @@ jobs:
     uses: ./.github/workflows/format-gate.yml
   structure-check:
     uses: ./.github/workflows/structure-check.yml
+  stale-path-check:
+    uses: ./.github/workflows/stale-path-check.yml
   pr-preview:
     uses: ./.github/workflows/pr-preview.yml
   claude-md-length:

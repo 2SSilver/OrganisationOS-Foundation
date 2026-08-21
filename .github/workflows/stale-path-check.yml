@@ -1,0 +1,54 @@
+name: stale-path-check
+
+# AR-05 regression guard. The 2026-05-22 three-repo split left 36
+# monorepo-era `foundation/<path>` references behind, which broke two agents,
+# five commands and the Pattern A mount allow-list without failing anything.
+# This check makes the stale form un-reintroducible.
+#
+# Two banned forms:
+#   1. `foundation/<path>` — the monorepo prefix. Foundation's content is at
+#      its repo root. Inside Foundation use a bare path; from a sibling repo
+#      use ../organisationos-foundation/<path>.
+#   2. `../foundation/`, `../leadership/`, `../domain/` — bare sibling names.
+#      The published repos are organisationos-*, so these resolve nowhere.
+#      Note the depth rule: a file one level in (domain-N/…, cadence/…) needs
+#      ../../organisationos-<repo>/, not ../.
+#
+# Allowed and deliberately excluded from the first pattern:
+#   - `organisationos-foundation` — the repo slug in `uses:` lines and the
+#     canonical sibling path.
+#   - `_foundation` — the actions/checkout destination in banned-string-check.
+#   - this file itself (`--exclude=stale-path-check.yml`) — the comment above
+#     spells out both banned forms verbatim so the error message can show a
+#     developer the exact string to stop using, which would otherwise make
+#     this check fail on every PR in every repo that runs it. grep --exclude
+#     matches on basename, so the one flag covers this reusable and each
+#     repo's caller of the same name.
+
+on:
+  workflow_call:
+
+jobs:
+  stale-paths:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Reject monorepo-era and bare-sibling paths
+        run: |
+          set -e
+          fail=0
+          hits=$(grep -rn 'foundation/' . --exclude-dir=.git --exclude=stale-path-check.yml \
+                  | grep -v 'organisationos-foundation' \
+                  | grep -v '_foundation' || true)
+          if [ -n "$hits" ]; then
+            echo "::error::monorepo-era 'foundation/<path>' prefix found. Foundation content is at the repo root; use a bare path inside Foundation, or ../organisationos-foundation/<path> from a sibling repo."
+            printf '%s\n' "$hits"
+            fail=1
+          fi
+          bare=$(grep -rnE '\.\./(foundation|leadership|domain)[/ ]' . --exclude-dir=.git --exclude=stale-path-check.yml || true)
+          if [ -n "$bare" ]; then
+            echo "::error::bare sibling path found. Use ../organisationos-<repo>/ (and ../../ from one level in)."
+            printf '%s\n' "$bare"
+            fail=1
+          fi
+          exit $fail
