@@ -52,11 +52,23 @@ jobs:
   banned-string:
     uses: ./.github/workflows/banned-string-check.yml
     with:
-      foundation-repo: <adopter-org>/organisationos-foundation
+      # Foundation IS the Foundation repo, so it resolves its own name rather
+      # than carrying the <adopter-org> placeholder that Domain and Leadership
+      # callers use. With the placeholder this job tried to clone a repository
+      # that cannot exist and failed with git exit 128.
+      foundation-repo: ${{ github.repository }}
       # Check the PR's own copy of banned-patterns.yml, not main — see Step 3's
       # exemption in banned-string-check.yml for the companion fix (Fs2-8).
       foundation-ref: ${{ github.sha }}
   markdown-lint:
+    # Job-scoped write: this job's reusable posts a PR comment on failure via
+    # github-script. Without it the comment step dies with "Resource not
+    # accessible by integration" and fails the job even when the check itself
+    # behaved correctly. Scoped here, not at workflow level, so the other jobs
+    # stay on the repo's read-only default.
+    permissions:
+      pull-requests: write
+      contents: read
     uses: ./.github/workflows/markdown-lint.yml
   format-gate:
     uses: ./.github/workflows/format-gate.yml
@@ -77,8 +89,24 @@ jobs:
   claude-md-length:
     uses: ./.github/workflows/claude-md-length.yml
   link-check:
+    # Job-scoped write: this job's reusable posts a PR comment on failure via
+    # github-script. Without it the comment step dies with "Resource not
+    # accessible by integration" and fails the job even when the check itself
+    # behaved correctly. Scoped here, not at workflow level, so the other jobs
+    # stay on the repo's read-only default.
+    permissions:
+      pull-requests: write
+      contents: read
     uses: ./.github/workflows/link-check.yml
   back-flow-rules:
+    # Job-scoped write: this job's reusable posts a PR comment on failure via
+    # github-script. Without it the comment step dies with "Resource not
+    # accessible by integration" and fails the job even when the check itself
+    # behaved correctly. Scoped here, not at workflow level, so the other jobs
+    # stay on the repo's read-only default.
+    permissions:
+      pull-requests: write
+      contents: read
     uses: ./.github/workflows/back-flow-rules.yml
 
   # --- Task 4 integrity jobs (below) ---
