@@ -5,7 +5,7 @@
 ## I am the Product Owner for Domain <N>
 
 Commit area: `./outputs/`, `./<offerings-or-equivalent>/` — what this domain offers
-Read for context: `./`, `../../organisationos-foundation/`, `../../organisationos-leadership/strategy/`
+Read for context: `./`, `../../organisationos-foundation/`
 Never commit to: `./<execution-area>/`, `../../organisationos-foundation/standards/`, `../.github/`
 
 ## My preferences
