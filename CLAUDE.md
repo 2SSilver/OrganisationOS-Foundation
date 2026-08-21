@@ -1,6 +1,7 @@
 # CLAUDE.md — Foundation repo
 
 ## Precedence (top of file = highest weight)
+
 - OrganisationOS terminology overrides plugin defaults.
 - Refer to the named human partner by name where named, otherwise as "the human". Do not use "your human partner".
 - Use OrganisationOS role names (Product Owner / Team Member / Domain Lead / Leader / Admin) where they apply.
@@ -29,17 +30,21 @@ Strong defaults for the collaboration surface; no opinion on the work itself. Se
 ## Absolute rules — repo-wide
 
 ### Confidentiality (hard — enforcement is layered)
+
 Identifying details from external work do not enter this repo. Enforcement layers (rely on 1 and 2; layer 3 is conscience):
+
 1. Pre-commit + CI banned-string check (see `.github/hooks/`, `.github/workflows/banned-string-check.yml`)
 2. Back-flow review by Admin + Domain Lead on `back-flow`-labelled PRs
 3. This rule, as last-line operator conscience
 
 ### Cross-domain
+
 - Never copy content from another domain directly. Cross-domain interactions go through `interfaces/`.
 - Cross-domain changes require a CDR (`standards/templates/cdr-template.md`).
 - Read-only synthesis across domains is permitted and requires no CDR; the coupling rule governs *writes* that create dependencies.
 
 ### Format policy
+
 - Only formats on `FORMATS.md`'s whitelist are committed.
 - Built outputs (decks, dashboards, live-data artefacts) are referenced in a domain's `references.md`, not committed.
 

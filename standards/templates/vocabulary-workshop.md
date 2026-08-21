@@ -13,6 +13,7 @@ Prospective Domain Leads (one per proposed domain), Product Owners, Leader, Admi
 ### Round 1 (45 min) — independent drafting
 
 Each Domain Lead writes:
+
 - The proposed domain name
 - 3-sentence description of what this domain does
 - 5 artefacts they expect the domain to own
@@ -21,6 +22,7 @@ Each Domain Lead writes:
 ### Round 2 (60 min) — pairwise reads
 
 Pairs of Domain Leads swap drafts. Each pair surfaces:
+
 - **Vocabulary clashes** (same word, different meaning across domains)
 - **Ownership overlaps** (one artefact claimed by two domains)
 - **Missing interfaces** (a dependency neither domain expected)
@@ -28,6 +30,7 @@ Pairs of Domain Leads swap drafts. Each pair surfaces:
 ### Round 3 (60 min) — plenary
 
 Leader chairs. Each clash, overlap, or missing interface is named in a 4-quadrant artefact:
+
 - **Resolved** — vocabulary tightened, ownership agreed
 - **Renamed** — one domain renames itself
 - **Merged** — two proposed domains collapse to one
@@ -36,6 +39,7 @@ Leader chairs. Each clash, overlap, or missing interface is named in a 4-quadran
 ### Round 4 (75 min) — write the output
 
 The Leader and Admin draft a `vocabulary-YYYY-MM-DD.md` committed to `leadership/cadence/`. Output includes:
+
 - Final domain names and one-paragraph charters
 - Glossary additions (terms with their resolved meanings)
 - A list of Round-3 "Deferred" items, each with a named owner and a review date

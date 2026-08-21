@@ -19,6 +19,7 @@ A decision lands here when the promotion trigger fires (per `standards/templates
 ## Frontmatter
 
 Every ADR in this folder uses the template at `standards/templates/adr-template.md` with the additional fields:
+
 - `promoted-from:` — URL of the original Domain ADR PR
 - `affected-domains:` — list of domain names
 

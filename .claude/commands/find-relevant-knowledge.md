@@ -15,9 +15,9 @@ On session start for any non-trivial task, run this command against the folders 
 1. Take the task description from the operator (or the current session's working context if no description supplied).
 2. Extract 3–7 key terms.
 3. Grep across:
-   - `foundation/` (all subfolders)
+   - `../organisationos-foundation/` (all subfolders)
    - The current domain's wiki/knowledge folder
-   - Any interfaces in `foundation/interfaces/` mentioning the current domain
+   - Any interfaces in `../organisationos-foundation/interfaces/` mentioning the current domain
 4. Surface the top 10 matches with a one-line summary each, ranked by recency and relevance.
 5. Note any matches in `_archive/` separately, with a banner — archived content is not current and should be verified before reuse.
 6. Read the most recent entries of the Foundation `CHANGELOG.md` (the announcement surface for merged non-CDR substrate changes) and surface them alongside the grep results — so an operator whose session started before a recent merge still sees what changed (spec §11.6 / §15.4).
@@ -26,7 +26,7 @@ On session start for any non-trivial task, run this command against the folders 
 
 A markdown report with:
 
-```
+```markdown
 ## Relevant existing knowledge for: <task description>
 
 ### Active matches (top 10)

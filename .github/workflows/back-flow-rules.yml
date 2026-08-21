@@ -28,13 +28,42 @@ on:
 
 jobs:
   back-flow:
-    if: contains(github.event.pull_request.labels.*.name, 'back-flow')
+    # AR-09: no job-level `if:`. A skipped required check reports as passing,
+    # so label-gating meant an unlabelled back-flow PR silently cleared the
+    # gate. The job now always runs and decides inside.
+    #
+    # The label stays the SIGNAL here, unlike checklist-complete. Back-flow is
+    # a provenance claim — content that came from external client work and has
+    # been anonymised — which is not derivable from where the files sit. Paths
+    # are used as a TRIPWIRE instead: a diff in back-flow-shaped folders with
+    # no `back-flow` label fails and asks for the label. Paths demand the
+    # label; they do not replace it.
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - name: Decide applicability (label is the signal, paths are a tripwire)
+        id: scope
+        run: |
+          set -e
+          labelled=${{ contains(github.event.pull_request.labels.*.name, 'back-flow') }}
+          files=$(git diff --name-only "origin/${{ github.base_ref }}...HEAD")
+          shaped=no
+          if printf '%s\n' "$files" | grep -qE '^domain-[0-9]+/(methods|prompts)/'; then shaped=yes; fi
+          echo "labelled=$labelled shaped=$shaped"
+          if [ "$labelled" != "true" ] && [ "$shaped" = "yes" ]; then
+            echo "::error::This PR changes domain-N/methods/ or domain-N/prompts/ — the folders back-flow content lands in — but carries no 'back-flow' label. Either label it so the 500-line cap and 24h cool-off apply, or move the change out of those folders. Do not merge an unlabelled back-flow PR."
+            exit 1
+          fi
+          if [ "$labelled" != "true" ]; then
+            echo "Not a back-flow PR — cap and cool-off not applicable. Check passes."
+            echo "applies=no" >> "$GITHUB_OUTPUT"
+          else
+            echo "applies=yes" >> "$GITHUB_OUTPUT"
+          fi
       - name: Enforce 500-line cap on back-flow PRs
+        if: steps.scope.outputs.applies == 'yes'
         run: |
           set -e
           added=$(git diff --shortstat "origin/${{ github.base_ref }}...HEAD" | grep -oE '[0-9]+ insertion' | grep -oE '[0-9]+' || echo 0)
@@ -43,6 +72,7 @@ jobs:
             exit 1
           fi
       - name: Enforce 24-hour cool-off
+        if: steps.scope.outputs.applies == 'yes'
         run: |
           set -e
           created="${{ github.event.pull_request.created_at }}"

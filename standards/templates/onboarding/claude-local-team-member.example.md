@@ -5,24 +5,28 @@
 ## I am a Team Member in Domain <N>
 
 Daily work: `./<execution-area>/methods/`, `./<execution-area>/notes/`, `./analysis/` (or equivalent)
-Read for context: `../foundation/`, `../leadership/strategy/`, `./README.md`
-Never commit to: `./outputs/`, `../foundation/standards/`, `../.github/`
+Read for context: `../../organisationos-foundation/`, `./README.md`
+Never commit to: `./outputs/`, `../../organisationos-foundation/standards/`, `../.github/`
 
 ## My preferences
+
 - Concise output — ask for detail when needed
 - Show structure first (headings, then content), not prose-first
 - Flag cross-domain implications up front, not at the end
 
 ## Active focus
+
 - <Current piece of work 1>
 - <Current piece of work 2>
 
 ## My peer references
+
 - Domain Lead: @<handle>
 - PO for this domain: @<handle> — gates publish on outputs my work touches
 - Admin: @<handle> — monthly maintenance check-in
 
 ## My agent preferences
+
 - Run `find-relevant-knowledge` before drafting new analysis
 - End every session with `update-wiki`
 - Tag the PO when execution detail likely affects an output
@@ -33,7 +37,7 @@ You typically work inside the **Domain repo**. Foundation is required for the sh
 
 Clone layout (siblings under one parent folder):
 
-```
+```text
 ~/projects/<adopter-org>/
 ├── organisationos-foundation/   # required (loaded via additionalDirectories)
 └── organisationos-domain/       # your primary working repo

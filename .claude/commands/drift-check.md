@@ -4,11 +4,28 @@ description: Scan every domain's CLAUDE.md against the harness baseline and repo
 
 # drift-check
 
-Scan every domain in this repo against the harness baseline and report drift.
+Scan every domain in the Domain repo against the harness baseline and report drift.
+
+## Precondition
+
+This command reads `domain-*/` relative to the session's working directory, and
+those directories live in the **Domain** repo — not in Foundation. Run it from a
+Claude session launched in the Domain clone, with Foundation mounted:
+
+```bash
+cd <path-to>/organisationos-domain
+claude --add-dir ../organisationos-foundation
+```
+
+If no `domain-*/` directory is found, **stop and report that the precondition
+was not met.** Do not emit an empty drift report: a report with no findings and
+a report that scanned nothing look identical to the reader, and this command
+exists to be trusted at the monthly DRI close-out.
 
 ## Steps
 
-1. For each `domain-*/CLAUDE.md`:
+1. For each `domain-*/CLAUDE.md` (if the glob matches nothing, halt per the
+   Precondition above rather than reporting a clean scan):
    - Verify the **Precedence block** is present at the top (regex: `## Precedence`).
    - Verify the Precedence block's **content** — not just the heading — matches
      the canonical text below byte-for-byte (extract from `## Precedence` to
@@ -46,7 +63,7 @@ Scan every domain in this repo against the harness baseline and report drift.
 
 A markdown report:
 
-```
+```markdown
 # Drift report — YYYY-MM-DD
 
 ## Domain-level findings

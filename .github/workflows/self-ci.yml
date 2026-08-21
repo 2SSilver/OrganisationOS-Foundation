@@ -38,34 +38,75 @@ name: self-ci
 
 on:
   pull_request:
-    # `labeled`/`unlabeled` are included so the `checklist-complete` job's
-    # label-gated `if:` (below) re-evaluates when a PR gains or loses the
-    # `cross-domain` label after opening, not just at open/sync/reopen —
-    # otherwise a PR labelled post-open with no later push never re-triggers
-    # this workflow and the required check stays stuck "Expected".
+    # `labeled`/`unlabeled` are included for the `back-flow-rules` job, whose
+    # label remains its signal by design: back-flow is a provenance claim, not
+    # something derivable from which files changed. A PR that gains the
+    # `back-flow` label after opening must re-trigger this workflow, or the
+    # 500-line cap and the 24-hour cool-off never apply to it.
+    #
+    # `checklist-complete` no longer needs these: it is path-driven since AR-09
+    # and carries no label condition at all. The types stay for back-flow.
     types: [opened, synchronize, reopened, labeled, unlabeled]
 
 jobs:
   banned-string:
     uses: ./.github/workflows/banned-string-check.yml
     with:
-      foundation-repo: <adopter-org>/organisationos-foundation
+      # Foundation IS the Foundation repo, so it resolves its own name rather
+      # than carrying the <adopter-org> placeholder that Domain and Leadership
+      # callers use. With the placeholder this job tried to clone a repository
+      # that cannot exist and failed with git exit 128.
+      foundation-repo: ${{ github.repository }}
       # Check the PR's own copy of banned-patterns.yml, not main — see Step 3's
       # exemption in banned-string-check.yml for the companion fix (Fs2-8).
       foundation-ref: ${{ github.sha }}
   markdown-lint:
+    # Job-scoped write: this job's reusable posts a PR comment on failure via
+    # github-script. Without it the comment step dies with "Resource not
+    # accessible by integration" and fails the job even when the check itself
+    # behaved correctly. Scoped here, not at workflow level, so the other jobs
+    # stay on the repo's read-only default.
+    permissions:
+      pull-requests: write
+      contents: read
     uses: ./.github/workflows/markdown-lint.yml
   format-gate:
     uses: ./.github/workflows/format-gate.yml
   structure-check:
     uses: ./.github/workflows/structure-check.yml
+  stale-path-check:
+    uses: ./.github/workflows/stale-path-check.yml
   pr-preview:
+    # Job-scoped, not workflow-scoped: a caller must be able to grant whatever
+    # its callee requests, and pr-preview posts a PR comment. Keeping the grant
+    # on this one job leaves every other job in this file on the repo's
+    # read-only default. A workflow-level block would hand write access to all
+    # twelve.
+    permissions:
+      pull-requests: write
+      contents: read
     uses: ./.github/workflows/pr-preview.yml
   claude-md-length:
     uses: ./.github/workflows/claude-md-length.yml
   link-check:
+    # Job-scoped write: this job's reusable posts a PR comment on failure via
+    # github-script. Without it the comment step dies with "Resource not
+    # accessible by integration" and fails the job even when the check itself
+    # behaved correctly. Scoped here, not at workflow level, so the other jobs
+    # stay on the repo's read-only default.
+    permissions:
+      pull-requests: write
+      contents: read
     uses: ./.github/workflows/link-check.yml
   back-flow-rules:
+    # Job-scoped write: this job's reusable posts a PR comment on failure via
+    # github-script. Without it the comment step dies with "Resource not
+    # accessible by integration" and fails the job even when the check itself
+    # behaved correctly. Scoped here, not at workflow level, so the other jobs
+    # stay on the repo's read-only default.
+    permissions:
+      pull-requests: write
+      contents: read
     uses: ./.github/workflows/back-flow-rules.yml
 
   # --- Task 4 integrity jobs (below) ---
@@ -177,26 +218,55 @@ jobs:
           PY
 
   checklist-complete:
-    # MR-06: produces the checklist-completeness check the PR templates (Task 1) promise —
-    # "CI verifies this checklist is complete on labelled cross-domain PRs (see Task 4)".
+    # MR-06: produces the checklist-completeness check the PR templates promise.
     # Cross-domain/substrate artefacts (CDRs, interfaces, NFRs, architectural decisions) all
     # live in Foundation (spec §11.2), so this is the one place the check needs to run.
-    if: contains(github.event.pull_request.labels.*.name, 'cross-domain')
+    # All four of those categories must appear in the substrate regex below — omitting one
+    # is a silent false pass, not a smaller check.
+    # AR-09: NO job-level `if:`. GitHub counts a skipped required check as
+    # passing, so a label-gated job silently reported green on every
+    # unlabelled cross-domain PR. Applicability is now computed from the
+    # changed files inside the job, so the check always runs and always
+    # reports. Labels are triage only and no longer gate anything.
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Determine whether this PR is cross-domain
+        id: scope
+        run: |
+          set -e
+          files=$(git diff --name-only "origin/${{ github.base_ref }}...HEAD")
+          printf 'changed files:\n%s\n' "$files"
+          cross=no
+          # Substrate artefacts that are cross-domain by definition (spec 11.2).
+          if printf '%s\n' "$files" | grep -qE '^(cross-domain-decisions|interfaces|architectural-decisions|nfrs)/'; then
+            cross=yes
+          fi
+          # Or a diff spanning two or more domain folders.
+          domains=$(printf '%s\n' "$files" | grep -oE '^domain-[0-9]+/' | sort -u | wc -l | tr -d ' ')
+          if [ "$domains" -ge 2 ]; then cross=yes; fi
+          echo "cross_domain=$cross" >> "$GITHUB_OUTPUT"
+          echo "cross_domain=$cross (domain folders touched: $domains)"
       - name: Verify the PR-template Approval checklist is complete
         env:
           PR_BODY: ${{ github.event.pull_request.body }}
+          CROSS_DOMAIN: ${{ steps.scope.outputs.cross_domain }}
         run: |
           set -e
+          if [ "$CROSS_DOMAIN" != "yes" ]; then
+            echo "Not a cross-domain PR — Approval checklist not required. Check passes."
+            exit 0
+          fi
           section=$(printf '%s\n' "$PR_BODY" | awk '/^## Approval checklist/{flag=1; next} /^## /{flag=0} flag')
           if [ -z "$section" ]; then
-            echo "::error::This PR is labelled 'cross-domain' but its body has no '## Approval checklist' section. Use the PR template (see spec §12)."
+            echo "::error::This PR changes cross-domain substrate but its body has no '## Approval checklist' section. Use the PR template (see spec §12)."
             exit 1
           fi
           unchecked=$(printf '%s\n' "$section" | grep -c '^- \[ \]' || true)
           if [ "$unchecked" -gt 0 ]; then
-            echo "::error::This PR is labelled 'cross-domain' but the Approval checklist has $unchecked unticked box(es):"
+            echo "::error::This PR changes cross-domain substrate but the Approval checklist has $unchecked unticked box(es):"
             printf '%s\n' "$section" | grep '^- \[ \]'
             echo "Tick a box only once the named reviewer has actually approved — do not merge on an incomplete checklist."
             exit 1

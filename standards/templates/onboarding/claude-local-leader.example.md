@@ -5,26 +5,30 @@
 ## I am the Leader
 
 Commit area: `leadership/strategy/`, `leadership/cadence/` (forum minutes, agendas)
-Required reviewer for: cross-domain decisions (CDRs), changes to `leadership/`, two-approver on `foundation/standards/` and `.github/workflows/`
+Required reviewer for: cross-domain decisions (CDRs), changes to `leadership/`, two-approver on Foundation's `standards/` and `.github/workflows/`
 Does not commit inside any single domain.
 
 ## My preferences
+
 - CDR debates focus on consequences per domain, not abstract principles
 - Resist override — let the forum decide; override only after 2 stalled cycles
 - Strategy revisions test against domain reality before publication
 
 ## Active focus
+
 - <Current strategy item 1>
 - <Current CDR under review>
 - <Major dependency between domains>
 
 ## My peer references
+
 - Each Domain Lead: @<handles>
 - Admin: @<handle> — drift log, propagation tracking, harness changes
 - POs: @<handles> — attend forum when on agenda
 - Upstream parent (if applicable): @<handle> — for orgs inside a larger structure
 
 ## My agent preferences
+
 - Read the `leadership/cadence/` minutes before each forum
 - Use `summariser.md` agent to digest long strategy drafts
 - Run `find-relevant-knowledge` across `leadership/strategy/` before drafting a new direction
@@ -35,7 +39,7 @@ You work across all three repos. Primary working repo: **Leadership** (strategy,
 
 Clone layout (siblings under one parent folder):
 
-```
+```text
 ~/projects/<adopter-org>/
 ├── organisationos-foundation/
 ├── organisationos-leadership/   # your primary working repo

@@ -3,6 +3,7 @@
 Named methodologies an adopter may choose to apply within their domains or rituals. The harness has no opinion on which (if any) an adopter uses.
 
 Each pattern is a single markdown page with:
+
 - A one-paragraph summary
 - A "when to use" note
 - A link to the canonical source

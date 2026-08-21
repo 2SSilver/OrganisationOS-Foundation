@@ -17,7 +17,7 @@
   description: "Cross-domain Decision Record"
 - name: "harness"
   color: "fbca04"
-  description: "Changes to .github/ or foundation/standards/"
+  description: "Changes to .github/ or standards/"
 - name: "drift"
   color: "d93f0b"
   description: "Admin's open maintenance items"

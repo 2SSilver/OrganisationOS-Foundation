@@ -3,12 +3,20 @@ name: pr-preview
 on:
   workflow_call:
 
-# Permissions for posting comments and deploying previews
+# This workflow renders Markdown with pandoc, uploads the result as a run
+# artefact, and posts one PR comment linking to it. `pull-requests: write` is
+# for that comment; `contents: read` is for the checkout. `actions/upload-artifact`
+# needs no scope of its own.
+#
+# It deliberately does NOT request `pages: write` or `id-token: write`: nothing
+# here deploys to GitHub Pages. Those two were declared and never used, and
+# because a caller must be able to grant everything its callee asks for, they
+# made every calling workflow fail at startup with zero jobs dispatched. An
+# adopter who swaps this for a real Pages deploy must add them back here AND
+# widen the calling job's `permissions:` block to match.
 permissions:
   pull-requests: write
   contents: read
-  pages: write
-  id-token: write
 
 jobs:
   build-preview:

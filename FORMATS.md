@@ -9,12 +9,12 @@ Three principles. The whitelist follows. Adopters apply the principles to add or
 ## In Git — whitelist
 
 | Format | Use for | Size cap |
-|---|---|---|
+| --- | --- | --- |
 | Markdown (`.md`) | Everything written | — |
 | Mermaid (in Markdown fences) | Diagrams expressible as graph, sequence, flow, tree | — |
 | Plain text (`.txt`) | Raw extracted text (transcripts, OCR, log dumps) | — |
 | CSV / TSV (`.csv`, `.tsv`) | Structured tabular data | — |
-| JSON / YAML (`.json`, `.yaml`, `.yml`) | Config, frontmatter, machine-readable data | — |
+| JSON / JSONC / YAML (`.json`, `.jsonc`, `.yaml`, `.yml`) | Config, frontmatter, machine-readable data. `.jsonc` is JSON with comments, used by tool configs such as `.markdownlint.jsonc` | — |
 | TOML (`.toml`) | Build/config files | — |
 | Excalidraw / Drawio (`.excalidraw`, `.drawio`) | Diagrams Mermaid cannot express | ≤500 KB |
 | SVG (`.svg`) | Generated diagram output | ≤200 KB |
@@ -27,7 +27,7 @@ Three principles. The whitelist follows. Adopters apply the principles to add or
 ## Out of Git — referenced via `references.md`
 
 | Format / system | Why out of Git |
-|---|---|
+| --- | --- |
 | Excel with macros, pivots, dashboards, live data | Binary, opaque, work doesn't diff cleanly |
 | *Plain tabular Excel* | Export to CSV and commit; the CSV is the source. |
 | PowerPoint / Keynote (`.pptx`, `.key`) | Binary, opaque to diff. Built from Markdown via the build-deck pattern. |

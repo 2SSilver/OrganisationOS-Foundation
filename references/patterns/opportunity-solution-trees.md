@@ -12,7 +12,7 @@ Opportunity-Solution Trees (Teresa Torres) are a discovery artefact for continuo
 
 ## Canonical source
 
-Teresa Torres, "Continuous Discovery Habits" — https://www.producttalk.org/
+Teresa Torres, "Continuous Discovery Habits" — <https://www.producttalk.org/>
 
 ## Note on use in OrganisationOS
 
