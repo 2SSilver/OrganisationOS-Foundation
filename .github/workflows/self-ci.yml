@@ -38,11 +38,14 @@ name: self-ci
 
 on:
   pull_request:
-    # `labeled`/`unlabeled` are included so the `checklist-complete` job's
-    # label-gated `if:` (below) re-evaluates when a PR gains or loses the
-    # `cross-domain` label after opening, not just at open/sync/reopen —
-    # otherwise a PR labelled post-open with no later push never re-triggers
-    # this workflow and the required check stays stuck "Expected".
+    # `labeled`/`unlabeled` are included for the `back-flow-rules` job, whose
+    # label remains its signal by design: back-flow is a provenance claim, not
+    # something derivable from which files changed. A PR that gains the
+    # `back-flow` label after opening must re-trigger this workflow, or the
+    # 500-line cap and the 24-hour cool-off never apply to it.
+    #
+    # `checklist-complete` no longer needs these: it is path-driven since AR-09
+    # and carries no label condition at all. The types stay for back-flow.
     types: [opened, synchronize, reopened, labeled, unlabeled]
 
 jobs:
